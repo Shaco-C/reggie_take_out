@@ -42,6 +42,8 @@ public class DishController {
     @PostMapping
     public R<String> save(@RequestBody DishDto dishDto) {
         dishService.saveWithFlavor(dishDto);
+        String key = "dish_"+dishDto.getCategoryId()+"_1";
+        redisTemplate.delete(key);
         return R.success("新增成功");
     }
 
@@ -119,7 +121,8 @@ public class DishController {
 
         dishService.removeByIds(id);
         log.info("删除的ids: {}", ids);
-
+        Set keys = redisTemplate.keys("dish_*");
+        redisTemplate.delete(keys);
         return R.success("删除成功");
     }
 
@@ -138,7 +141,8 @@ public class DishController {
         }).collect(Collectors.toList());
 
         dishService.updateBatchById(dishes);
-
+        Set keys = redisTemplate.keys("dish_*");
+        redisTemplate.delete(keys);
         return R.success("修改成功");
     }
 
